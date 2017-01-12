@@ -9,21 +9,35 @@ namespace WebApiSingleton.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        private GenerateNewTasks webApiNewTask = new GenerateNewTasks();
         private ThreadSafeSingleton myInstance = ThreadSafeSingleton.Instance;
-        
+
         // GET api/values
-        [HttpGet("add")]
-        public IActionResult GetMoreInt()
+        [HttpGet("{userName}/start")]
+        public IActionResult Start(string userName)
         {
-            List<int> returnedResult = myInstance.AddInts(); 
-            return Ok(returnedResult);
+            webApiNewTask.StartNewTask(userName);
+            return Ok($"Started counting for {userName}");
         }
 
-        [HttpGet("subtract")]
-        public IActionResult GetLessInt()
+        [HttpGet("{userName}/stop")]
+        public IActionResult Stop(string userName)
         {
-            List<int> returnedResult = myInstance.RemoveLastInt();
-            return Ok(returnedResult);
+            webApiNewTask.StopThread(userName);
+            return Ok($"Stopped counting for {userName}");
+        }
+
+        [HttpGet("returnints")]
+        public IActionResult ReturnInts()
+        {
+            return Ok(myInstance.SendInts());
+        }
+
+        [HttpGet("returntasks")]
+        public IActionResult ReturnTasks()
+        {
+            int runningNumberOfTasks = myInstance.RetrieveUserTask();
+            return Ok($"Running number of counting tasks is: {runningNumberOfTasks}");
         }
     }
 }
